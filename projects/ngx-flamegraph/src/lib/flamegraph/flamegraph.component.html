@@ -1,10 +1,5 @@
 <!--
-  This component relies on css transform translate and scaleX in order to animate the positioning and expansion of flamegraph bars.
-
-  Notably there were two design decisions made to optimize this component:
-
-    1. No animations are performed on svg elements. Animating vector graphics requires the browser to rasterize each indiviudal frame (even if we're simply animating on transform translate). Instead svg elements are wrapped in divs and their parent divs are animated with transform translate, which skips rasterization and jumps straight to compositing.
-    2. Expansion animations rely on animating transform scaleX instead of width. Animating width would cause the browser to trigger layout recalculation on each frame, whereas animating transform scaleX relies on the compositor.
+  This component relies on CSS transform translate and scaleX in order to animate the positioning and expansion of flamegraph bars. Animating width would cause the browser to trigger layout recalculation on each frame, whereas animating transform scaleX relies on the compositor.
 -->
 
 <div class="ngx-fg-chart-wrapper" [class.ngx-fg-grayscale]="selectedData && selectedData.length">
@@ -20,19 +15,5 @@
     [attr.data-idx]="i"
   >
     <span>{{ entry.label }}</span>
-    <!-- <div
-      class="svg-wrapper"
-      [style.transform]="'scaleX(' + getWidth(entry) / width + ')'"
-      [style.height.px]="levelHeight"
-    >
-        <g
-          flamegraph-node
-          (click)="frameClick.emit(entry.original)"
-          (mouseOverZoneless)="frameMouseEnter.emit(entry.original)"
-          (mouseLeaveZoneless)="frameMouseLeave.emit(entry.original)"
-          (zoom)="zoom.emit(entry)"
-          [navigable]="entry.navigable"
-        ></g>
-    </div> -->
   </div>
 </div>

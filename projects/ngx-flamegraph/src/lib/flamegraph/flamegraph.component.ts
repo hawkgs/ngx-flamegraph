@@ -23,9 +23,10 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FlamegraphComponent implements OnInit, OnDestroy {
-  private readonly _zone = inject(NgZone);
+  private readonly _ngZone = inject(NgZone);
   private readonly _renderer = inject(Renderer2);
   private readonly _elementRef = inject(ElementRef);
+
   private _unlisteners: (() => void)[] = [];
 
   selectedData: Data[] = [];
@@ -73,8 +74,9 @@ export class FlamegraphComponent implements OnInit, OnDestroy {
     let currentTarget: Element | null = null;
     let currentEntry: Data | null = null;
 
-    this._zone.runOutsideAngular(() => {
-      this._unlisteners = [
+    // Zoneless
+    this._ngZone.runOutsideAngular(() => {
+      this._unlisteners.push(
         this._renderer.listen(el, 'mousemove', (e: MouseEvent) => {
           if (currentTarget !== e.target) {
             currentTarget = e.target as Element | null;
@@ -91,22 +93,25 @@ export class FlamegraphComponent implements OnInit, OnDestroy {
             currentTarget = null;
             currentEntry = null;
           }
-        }),
-        this._renderer.listen(el, 'click', (e: MouseEvent) => {
-          const entry = this._getBarElementEntry(e.target as Element | null);
-          if (entry) {
-            this.frameClick.emit(entry.original);
-          }
-        }),
-        this._renderer.listen(el, 'dblclick', (e: MouseEvent) => {
-          const entry = this._getBarElementEntry(e.target as Element | null);
-          if (entry) {
-            console.log('zooming', entry);
-            this.zoom.emit(entry);
-          }
-        }),
-      ];
+        })
+      );
     });
+
+    // Inside Zone
+    this._unlisteners.push(
+      this._renderer.listen(el, 'click', (e: MouseEvent) => {
+        const entry = this._getBarElementEntry(e.target as Element | null);
+        if (entry) {
+          this.frameClick.emit(entry.original);
+        }
+      }),
+      this._renderer.listen(el, 'dblclick', (e: MouseEvent) => {
+        const entry = this._getBarElementEntry(e.target as Element | null);
+        if (entry) {
+          this.zoom.emit(entry);
+        }
+      })
+    );
   }
 
   private _getBarElementEntry(element: Element | null): Data | null {
@@ -120,6 +125,6 @@ export class FlamegraphComponent implements OnInit, OnDestroy {
     }
 
     const idx = parseInt(dataIdx, 10);
-    return this.entries[idx];
+    return this.entries[idx] ?? null;
   }
 }
