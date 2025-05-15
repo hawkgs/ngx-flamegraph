@@ -89,6 +89,10 @@ export class FlamegraphComponent implements OnInit, OnDestroy {
     this._ngZone.runOutsideAngular(() => {
       const mousemove = this._renderer.listen(el, 'mousemove', (e: MouseEvent) => {
         if (currentTarget !== e.target) {
+          if (currentEntry) {
+            this.frameMouseLeave.emit(currentEntry.original);
+          }
+
           currentTarget = e.target as Element | null;
           currentEntry = this._getBarElementEntry(currentTarget);
 
