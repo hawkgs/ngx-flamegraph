@@ -75,7 +75,7 @@ export class FlamegraphComponent implements OnInit, OnDestroy {
     // the width in order to achieve 1px column gap.
     const singlePixel = entry.widthRatio / this.getWidth(entry);
     const width = 1 - entry.widthRatio + singlePixel;
-    const widthInPerc = Math.round(width * 100 * 100) / 100;
+    const widthInPerc = Math.round(width * 100 * 1000) / 1000;
 
     return `inset(0 ${widthInPerc}% 0 0)`;
   }
