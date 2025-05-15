@@ -35,6 +35,8 @@ export interface FlameGraphConfig {
 
 const isResizeObserverAvailable = typeof ResizeObserver !== 'undefined';
 
+const RESIZE_DEBOUNCE = 125;
+
 @Component({
   selector: 'ngx-flamegraph',
   templateUrl: './ngx-flamegraph.component.html',
@@ -50,6 +52,7 @@ export class NgxFlamegraphComponent implements OnInit, OnDestroy {
   private _colors: FlamegraphColor;
   // tslint:disable-next-line: variable-name
   private _data: RawData[];
+  private _resizeTimeout?: ReturnType<typeof setTimeout>;
 
   @Output() frameClick = new EventEmitter<RawData>();
   @Output() frameMouseEnter = new EventEmitter<RawData>();
@@ -81,9 +84,14 @@ export class NgxFlamegraphComponent implements OnInit, OnDestroy {
     if (parent && this.width === null && isResizeObserverAvailable) {
       // Explicitly fire ResizeObserver callback inside the Angular zone
       // because ResizeObserver is not patched by zone.js by default
-      this._resizeObserver = new ResizeObserver(() =>
-        this._ngZone.run(() => this._onParentResize())
-      );
+      this._resizeObserver = new ResizeObserver(() => {
+        if (this._resizeTimeout) {
+          clearTimeout(this._resizeTimeout);
+        }
+        this._resizeTimeout = setTimeout(() => {
+          this._ngZone.run(() => this._onParentResize());
+        }, RESIZE_DEBOUNCE);
+      });
       this._resizeObserver.observe(parent);
     }
   }
