@@ -7,7 +7,7 @@ ngx-flamegraph-graph {
 .ngx-fg-bar {
   position: absolute;
   transform-origin: left;
-  transition: transform 0.333s ease-in-out, opacity 0.333s ease-in-out, clip-path 0.333s ease-in-out;
+  transition: transform 0.333s ease-in-out, opacity 0.333s ease-in-out;
   z-index: 1;
   overflow: hidden;
   width: 100%;
