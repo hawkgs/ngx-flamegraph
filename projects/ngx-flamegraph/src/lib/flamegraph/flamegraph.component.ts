@@ -58,6 +58,7 @@ export class FlamegraphComponent implements OnInit, OnDestroy {
   }
 
   getTop(entry: Data) {
+    // Add the rowNumber for a 1px row gap.
     return entry.rowNumber * this.levelHeight + entry.rowNumber;
   }
 
@@ -66,7 +67,17 @@ export class FlamegraphComponent implements OnInit, OnDestroy {
   }
 
   getWidth(entry: Data) {
-    return entry.widthRatio * this.width - 1 || 0;
+    return entry.widthRatio * this.width || 0;
+  }
+
+  getClipPathWidth(entry: Data) {
+    // Calculate a single pixel ratio and subtract it from
+    // the width in order to achieve 1px column gap.
+    const singlePixel = entry.widthRatio / this.getWidth(entry);
+    const width = 1 - entry.widthRatio + singlePixel;
+    const widthInPerc = Math.round(width * 100 * 100) / 100;
+
+    return `inset(0 ${widthInPerc}% 0 0)`;
   }
 
   private _initEventListeners() {
@@ -76,42 +87,43 @@ export class FlamegraphComponent implements OnInit, OnDestroy {
 
     // Zoneless
     this._ngZone.runOutsideAngular(() => {
-      this._unlisteners.push(
-        this._renderer.listen(el, 'mousemove', (e: MouseEvent) => {
-          if (currentTarget !== e.target) {
-            currentTarget = e.target as Element | null;
-            currentEntry = this._getBarElementEntry(currentTarget);
+      const mousemove = this._renderer.listen(el, 'mousemove', (e: MouseEvent) => {
+        if (currentTarget !== e.target) {
+          currentTarget = e.target as Element | null;
+          currentEntry = this._getBarElementEntry(currentTarget);
 
-            if (currentEntry) {
-              this.frameMouseEnter.emit(currentEntry.original);
-            }
-          }
-        }),
-        this._renderer.listen(el, 'mouseleave', () => {
           if (currentEntry) {
-            this.frameMouseLeave.emit(currentEntry.original);
-            currentTarget = null;
-            currentEntry = null;
+            this.frameMouseEnter.emit(currentEntry.original);
           }
-        })
-      );
+        }
+      });
+
+      const mouseleave = this._renderer.listen(el, 'mouseleave', () => {
+        if (currentEntry) {
+          this.frameMouseLeave.emit(currentEntry.original);
+          currentTarget = null;
+          currentEntry = null;
+        }
+      });
+
+      this._unlisteners.push(mousemove, mouseleave);
     });
 
     // Inside Zone
-    this._unlisteners.push(
-      this._renderer.listen(el, 'click', (e: MouseEvent) => {
-        const entry = this._getBarElementEntry(e.target as Element | null);
-        if (entry) {
-          this.frameClick.emit(entry.original);
-        }
-      }),
-      this._renderer.listen(el, 'dblclick', (e: MouseEvent) => {
-        const entry = this._getBarElementEntry(e.target as Element | null);
-        if (entry) {
-          this.zoom.emit(entry);
-        }
-      })
-    );
+    const click = this._renderer.listen(el, 'click', (e: MouseEvent) => {
+      const entry = this._getBarElementEntry(e.target as Element | null);
+      if (entry) {
+        this.frameClick.emit(entry.original);
+      }
+    });
+    const dblclick = this._renderer.listen(el, 'dblclick', (e: MouseEvent) => {
+      const entry = this._getBarElementEntry(e.target as Element | null);
+      if (entry) {
+        this.zoom.emit(entry);
+      }
+    });
+
+    this._unlisteners.push(click, dblclick);
   }
 
   private _getBarElementEntry(element: Element | null): Data | null {

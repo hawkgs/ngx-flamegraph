@@ -7,27 +7,17 @@ ngx-flamegraph-graph {
 .ngx-fg-bar {
   position: absolute;
   transform-origin: left;
-  transition: transform 0.333s ease-in-out, opacity 0.333s ease-in-out;
+  transition: transform 0.333s ease-in-out, opacity 0.333s ease-in-out, clip-path 0.333s ease-in-out;
   z-index: 1;
   overflow: hidden;
+  width: 100%;
   user-select: none;
   color: white;
   font-family: sans-serif;
   font-size: 80%;
-  display: flex;
-  align-items: center;
-}
-
-.ngx-fg-bar:hover {
-  filter: brightness(110%);
-}
-
-.ngx-fg-bar > span {
-  position: relative;
-  padding: 0 5px;
-  pointer-events: none;
-  text-overflow: ellipsis;
-  overflow: hidden;
+  padding: 4px 5px;
+  box-sizing: border-box;
+  cursor: default;
 }
 
 .ngx-fg-hide-bar {

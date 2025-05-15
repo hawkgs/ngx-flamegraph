@@ -1,5 +1,8 @@
 <!--
-  This component relies on CSS transform translate and scaleX in order to animate the positioning and expansion of flamegraph bars. Animating width would cause the browser to trigger layout recalculation on each frame, whereas animating transform scaleX relies on the compositor.
+  This component relies on CSS `transform` translate and `clip-path`
+  in order to animate the positioning and expansion of flamegraph bars.
+  Animating `width` would cause the browser to trigger layout recalculation on each frame,
+  whereas animating `clip-path` is hardware-accelerated.
 -->
 
 <div class="ngx-fg-chart-wrapper" [class.ngx-fg-grayscale]="selectedData && selectedData.length">
@@ -8,12 +11,12 @@
     class="ngx-fg-bar"
     [class.ngx-fg-hide-bar]="!(minimumBarSize === undefined || getWidth(entry) > minimumBarSize)"
     [class.ngx-fg-navigable]="entry.navigable"
-    [style.width.px]="getWidth(entry)"
+    [style.clip-path]="getClipPathWidth(entry)"
     [style.height.px]="levelHeight"
     [style.transform]="'translate(' + getLeft(entry) + 'px,' + getTop(entry) + 'px)'"
     [style.background]="entry.color"
     [attr.data-idx]="i"
   >
-    <span>{{ entry.label }}</span>
+    {{ entry.label }}
   </div>
 </div>
