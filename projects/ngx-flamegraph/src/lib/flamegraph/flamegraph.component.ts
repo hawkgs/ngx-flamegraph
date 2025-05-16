@@ -70,6 +70,15 @@ export class FlamegraphComponent implements OnInit, OnDestroy {
     return entry.widthRatio * this.width || 0;
   }
 
+  getScaleX(entry: Data) {
+    // Calculate a single pixel ratio and subtract it from
+    // the width in order to achieve 1px column gap.
+    const singlePixel = entry.widthRatio / this.getWidth(entry);
+    const width = entry.widthRatio + singlePixel;
+
+    return width;
+  }
+
   getClipPathWidth(entry: Data) {
     // Calculate a single pixel ratio and subtract it from
     // the width in order to achieve 1px column gap.

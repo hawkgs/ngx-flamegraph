@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Test</title>
+    <style>
+      body {
+        background: #333;
+        color: white;
+        font-family: sans-serif;
+      }
+      #cont {
+        background-color: rgb(29, 142, 203);
+        clip-path: inset(0 0 0 0);
+        transition: clip-path 300ms;
+      }
+      #trigger {
+        margin-top: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cont">Test cont</div>
+    <button id="trigger">TEST</button>
+    <script>
+      const trigger = document.getElementById('trigger');
+      const cont = document.getElementById('cont');
+
+      trigger.addEventListener('click', () => {
+        cont.style.clipPath = 'inset(0 100px 0 0)';
+        // cont.style.webkitClip
+        // cont.classList.add('anim');
+      });
+    </script>
+  </body>
+</html>

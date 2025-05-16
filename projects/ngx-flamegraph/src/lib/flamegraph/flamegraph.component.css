@@ -15,9 +15,17 @@ ngx-flamegraph-graph {
   color: white;
   font-family: sans-serif;
   font-size: 80%;
-  padding: 4px 5px;
   box-sizing: border-box;
   cursor: default;
+}
+
+.ngx-fg-bar::after {
+  content: attr(data-label);
+  position: absolute;
+  transform-origin: left;
+  transform: scaleX(var(--scale-x));
+  top: 4px;
+  padding-left: 5px;
 }
 
 .ngx-fg-hide-bar {
