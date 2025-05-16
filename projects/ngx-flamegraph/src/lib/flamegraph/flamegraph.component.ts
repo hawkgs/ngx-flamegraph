@@ -85,29 +85,31 @@ export class FlamegraphComponent implements OnInit, OnDestroy {
     let currentTarget: Element | null = null;
     let currentEntry: Data | null = null;
 
-    // Zoneless
+    // Outside Angular
     this._ngZone.runOutsideAngular(() => {
       const mousemove = this._renderer.listen(el, 'mousemove', (e: MouseEvent) => {
-        if (currentTarget !== e.target) {
-          if (currentEntry) {
-            this.frameMouseLeave.emit(currentEntry.original);
-          }
+        if (currentTarget === e.target) {
+          return;
+        }
+        if (currentEntry) {
+          this.frameMouseLeave.emit(currentEntry.original);
+        }
 
-          currentTarget = e.target as Element | null;
-          currentEntry = this._getBarElementEntry(currentTarget);
+        currentTarget = e.target as Element | null;
+        currentEntry = this._getBarElementEntry(currentTarget);
 
-          if (currentEntry) {
-            this.frameMouseEnter.emit(currentEntry.original);
-          }
+        if (currentEntry) {
+          this.frameMouseEnter.emit(currentEntry.original);
         }
       });
 
       const mouseleave = this._renderer.listen(el, 'mouseleave', () => {
-        if (currentEntry) {
-          this.frameMouseLeave.emit(currentEntry.original);
-          currentTarget = null;
-          currentEntry = null;
+        if (!currentEntry) {
+          return;
         }
+        this.frameMouseLeave.emit(currentEntry.original);
+        currentTarget = null;
+        currentEntry = null;
       });
 
       this._unlisteners.push(mousemove, mouseleave);
